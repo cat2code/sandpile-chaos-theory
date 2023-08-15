@@ -1,4 +1,4 @@
-# <p align = "center"> Sandpile </p>
+# sandpile-chaos-theory# <p align = "center"> Sandpile </p>
 ---
 
 <p align = "center"> Python implementation of the Sandpile Model </p>
