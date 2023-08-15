@@ -1,4 +1,8 @@
 # sandpile-chaos-theory# <p align = "center"> Sandpile </p>
+This is a project in a course of chaos theory at Lund University, Sweden. We took the liberty of using the code we found from this original project by kivyfreakt:
+https://github.com/kivyfreakt/sandpile
+
+
 ---
 
 <p align = "center"> Python implementation of the Sandpile Model </p>
