@@ -39,17 +39,16 @@ parfor i = 1:length(Z)
             if length(Y) > min_length
                %idx = find(Y, 1, 'last')
                Y = Y(1:find(Y, 1, 'last'))
-            else
-               Y = [Y, zeros(1, min_length-length(Y))]
             end
-                
-            Y'
-           
+            
+            Y = [Y; zeros(min_length-length(Y),1)]
             Y(Y~=0) = log( Y(Y~=0) );
             
             X = log( 1:length(Y) );
             
             R = corrcoef(X, Y);
+            
+            Y
             
             if (length(R) < 2)
                 tempL(i,j) = 0;                
