@@ -6,13 +6,14 @@ clc;
 
 %% Initial Run
 
-pile_width = 20;
-simulation_length = 100000;
+pile_width = 10;
+simulation_length = 10000;
 
 load(['data/StateDensity_side', num2str(pile_width),'.mat'])
+load(['data/Range_side', num2str(pile_width),'.mat'])
 
-%pile = 0 * ones(pile_width);
-pile = randi([0, 3], pile_width, pile_width);
+pile = 3 * ones(pile_width);
+%pile = randi([0, 3], pile_width, pile_width);
 [~, avalanche_histogram, grain_sums, entropies, laplacians] = simulateSandpile(pile, simulation_length);
 
 %% Plots
@@ -45,8 +46,8 @@ grid on; hold on;
 % ylabel('Laplacian Mean')
 % grid on; hold on;
 
-fig_phase_ge = figure(); hold on;
-title('Number of Grains and Shannon Entropy')
+fig_phase_ge_density = figure('position',[0,0,1600,900]); hold on;
+title('Phase Space State Density, with a Trajectory')
 xlabel('Number of Grains [as a Fraction of the Maximal Number of Grains]')
 ylabel('Shannon Entropy')
 img = image([0, 1], [0,1], Z');
@@ -56,9 +57,36 @@ xlim([0,1])
 ylim([0,1])
 c = colorbar();
 c.Limits = [ 0, max(max( Z(~isinf(Z)) )) ];
+c.Label.String = "Natural Logarithm of State Count";
+c.Label.Rotation = 270;
+c.Label.FontSize = 12;
+c.Label.Position = c.Label.Position + [1, 0, 0];
 caxis([0, max(max( Z(~isinf(Z)))) ])
-colormap(hot(1000))
-plot(grain_sums, entropies, 'b--')
+colormap(hot(5000))
+plot(grain_sums, entropies, 'g--')
+legend('Trajectory','Location','southeast')
+hold off;
+
+fig_phase_ge_range = figure('position',[0,0,1600,900]); hold on;
+title('Phase Space Power Lawness, with a Trajectory')
+xlabel('Number of Grains [as a Fraction of the Maximal Number of Grains]')
+ylabel('Shannon Entropy')
+img = image([0, 1], [0,1], L');
+img.CDataMapping = 'scaled';
+set(gca,'YDir','normal')
+xlim([0,1])
+ylim([0,1])
+c = colorbar();
+c.Limits = [ -1, 1 ];
+c.Label.String = 'Power Lawness';
+c.Label.Rotation = 270;
+c.Label.FontSize = 12;
+c.Label.Position = c.Label.Position + [1, 0, 0];
+caxis([-1, 1 ])
+cmap = [ [zeros(1, 501), linspace(0.15,1,500)]', zeros(1001,1), [linspace(1,0.15,500), zeros(1, 501)]'];
+colormap(cmap);
+plot(grain_sums, entropies, 'g--')
+legend('Trajectory','Location','southeast')
 hold off;
 
 % fig_phase_gl = figure();
