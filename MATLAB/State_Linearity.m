@@ -1,11 +1,13 @@
 %% Linearity of loglog in Phase Space
 % Authors: Aron Paulsson, Eliot Montesino Petren & Torbjörn Onshage
 clear all;
-close all;
-clc;
+%close all;
+%clc;
 
-side_length = 3;
+side_length = 20;
 size = side_length * side_length;
+
+%%
 
 load(['data/StateDensity_side', num2str(side_length),'.mat'])
 
@@ -22,7 +24,7 @@ parfor i = 1:length(Z)
             Entropy = (j-1)/100;
             
             avalanche_histogram = zeros(1000, 1);
-            NbrPiles = 1000;
+            NbrPiles = 10000;
             for idx=NbrGrains
                 out = simulate_state(side_length,idx,Entropy,NbrPiles);
 
@@ -34,31 +36,34 @@ parfor i = 1:length(Z)
             end
             
             Y = avalanche_histogram(2:end);
+            %Y = Y(1:find(Y~=0, 1, 'last'))
             
-            min_length = 25;
-            if length(Y) > min_length
-               %idx = find(Y, 1, 'last')
-               Y = Y(1:find(Y, 1, 'last'))
+            range = find(Y~=0, 1, 'last') - find(Y~=0, 1);
+            if isempty(range)
+                tempL(i,j) = 0;
+                continue
             end
             
-            Y = [Y; zeros(min_length-length(Y),1)]
+            X = log( 1:length(Y) );
+            X = X(find(Y~=0, 1):find(Y~=0, 1, 'last'));
+            Y = Y(find(Y~=0, 1):find(Y~=0, 1, 'last'));
+            
             Y(Y~=0) = log( Y(Y~=0) );
             
-            X = log( 1:length(Y) );
+            if length(Y) < 2
+                tempL(i,j) = 0;
+                continue
+            end
             
             R = corrcoef(X, Y);
             
-            Y
-            
-            if (length(R) < 2)
-                tempL(i,j) = 0;                
-            else
-                if isnan(R(2))
-                    tempL(i,j) = 0;
-                else
-                    tempL(i,j) = abs(R(2));
-                end
+            if sum(sum(isnan(R)))
+                tempL(i,j) = 0;
+                continue
             end
+            
+            tempL(i,j) = R(2) * range / size;
+            
         end
 
     end
@@ -67,11 +72,15 @@ end
 
 %% Store Matrix
 
-save(['data/LinearCorrelation_side', num2str(side_length),'.mat'], 'L')
+save(['data/Range_side', num2str(side_length),'.mat'], 'L')
+
+%save(['data/LinearCorrelation_side', num2str(side_length),'.mat'], 'L')
 
 %% Plot
 
-load(['data/LinearCorrelation_side', num2str(15),'.mat'])
+load(['data/Range_side', num2str(side_length),'.mat'])
+
+% load(['data/LinearCorrelation_side', num2str(side_length),'.mat'])
 
 fig_state_density = figure(); hold on;
 title('State Density');
@@ -83,8 +92,10 @@ set(gca,'YDir','normal')
 xlim([0,1])
 ylim([0,1])
 c = colorbar();
-c.Limits = [ 0, max(max( L(~isinf(L)) )) ];
-caxis([0, max(max( L(~isinf(L)))) ])
-colormap(hot(1000))
+c.Limits = [ -1, 1 ];
+caxis([ -1, 1 ])
+cmap = [ [zeros(1, 501), linspace(0.15,1,500)]', zeros(1001,1), [linspace(1,0.15,500), zeros(1, 501)]'];
+colormap(cmap);
+%colormap(hot(1000))
 hold off;
 

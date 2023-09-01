@@ -6,8 +6,8 @@ clc;
 
 %% Initial Run
 
-pile_width = 22;
-simulation_length = 5000;
+pile_width = 20;
+simulation_length = 100000;
 
 load(['data/StateDensity_side', num2str(pile_width),'.mat'])
 
